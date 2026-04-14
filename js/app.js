@@ -464,3 +464,20 @@ window.addEventListener('resize', () => {
         setTimeout(() => map.invalidateSize(), 200);
     }
 });
+
+// 4. ฟังก์ชันแชร์เส้นทางไปยัง Google Maps
+function shareToGoogleMap() {
+    if (!originMarker || !destinationMarker) {
+        alert("กรุณาระบุต้นทางและปลายทางให้ครบถ้วนก่อนครับ");
+        return;
+    }
+    
+    const startLat = originMarker.getLatLng().lat;
+    const startLng = originMarker.getLatLng().lng;
+    const endLat = destinationMarker.getLatLng().lat;
+    const endLng = destinationMarker.getLatLng().lng;
+
+    // เปิด Google Maps แบบกำหนดต้นทางและปลายทางเพื่อนำทาง
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${startLat},${startLng}&destination=${endLat},${endLng}&travelmode=driving`;
+    window.open(googleMapsUrl, '_blank');
+}

@@ -82,6 +82,33 @@ body {
     transform: scale(0.98);
 }
 
+.btn-share-gmaps {
+    background-color: #34a853;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.3s, transform 0.1s;
+    box-shadow: 0 4px 10px rgba(52, 168, 83, 0.2);
+}
+
+.btn-share-gmaps:hover {
+    background-color: #2b8842;
+}
+
+.btn-share-gmaps:active {
+    transform: scale(0.98);
+}
+
 .btn-pin {
     background-color: #f8f9fa;
     border: 1.5px solid #e0e0e0;

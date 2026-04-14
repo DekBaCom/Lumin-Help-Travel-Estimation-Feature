@@ -17,6 +17,7 @@ If the battery range is insufficient, the system provides reliable recommendatio
 - **Smart EV Station Finder**: If the destination distance exceeds the available battery, the app automatically finds and drops charging station pins that support your car's charging type (AC/DC) along with Google Maps navigation links.
 - **Smart Geocoding Search**: Simply type the name of the province, shop, or location, and hit the search button (🔍). 
 - **Manual Map Pinning 📍**: Alternatively, use the Pin option and click anywhere on the map to pinpoint an exact custom location.
+- **Google Maps Integration**: Instantly send your calculated origin and destination directly into Google Maps to seamlessly launch native driving directions!
 - **Responsive "Any Device" Design**: Fluid UI that works beautifully across all platforms. Automatically adapts to a modern **Bottom-Sheet Drawer** behavior on smartphones, mimicking premium native mapping applications!
 - **Dedicated Instruction Page**: A beautifully designed `/howto.html` page detailing map usage rules and graphical legends.
 
@@ -28,6 +29,7 @@ If the battery range is insufficient, the system provides reliable recommendatio
 4. **Vehicle Profile**: Select your EV Class `(Lumin L AC หรือ Lumin L DC)`.
 5. **Current Battery**: Enter your dashboard battery percentage (%).
 6. **Calculate**: Click `คำนวณการเดินทาง`.
+7. **Navigate**: If you're ready, hit the green `🗺️ นำทางด้วย Google Maps` button to launch immediate driving directions!
 
 > 💡 **Need Help?** You can click the "💡 วิธีใช้" (How-To) button directly within the app to seamlessly read an immersive graphical guide on how the mapping system works.
 
