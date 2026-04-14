@@ -10,6 +10,7 @@ let pinMode = null;
 let originMarker = null;
 let destinationMarker = null;
 let customPinLayerGroup;
+let routeLayerGroup;
 
 // 1. ฟังก์ชันเริ่มต้นสร้างแผนที่
 function initMap() {
@@ -24,6 +25,7 @@ function initMap() {
     // สร้าง Layer สำหรับหมุดสถานีชาร์จ และ หมุดต้นทาง/ปลายทาง
     markerLayerGroup = L.layerGroup().addTo(map);
     customPinLayerGroup = L.layerGroup().addTo(map);
+    routeLayerGroup = L.layerGroup().addTo(map);
 
     // จัดการการคลิกบนแผนที่เพื่อปักหมุด
     map.on('click', function(e) {
@@ -205,9 +207,27 @@ async function calculateRoute() {
     const estimatedRange = (maxRange * (battery / 100)).toFixed(0);
 
     // หาระยะทางจากหมุดจริงๆ
-    const distanceMeters = map.distance(originMarker.getLatLng(), destinationMarker.getLatLng());
-    // คูณ 1.3 เพื่อชดเชยความเป็นจริงให้ใกล้เคียงระยะทางถนนมากขึ้น
-    let finalRouteDistance = Math.round((distanceMeters / 1000) * 1.3);
+    let finalRouteDistance = 0;
+    let routeCoords = null;
+    
+    try {
+        const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${originMarker.getLatLng().lng},${originMarker.getLatLng().lat};${destinationMarker.getLatLng().lng},${destinationMarker.getLatLng().lat}?overview=full&geometries=geojson`;
+        const res = await fetch(osrmUrl);
+        const data = await res.json();
+        if (data.routes && data.routes.length > 0) {
+            const route = data.routes[0];
+            finalRouteDistance = Math.round(route.distance / 1000);
+            routeCoords = route.geometry.coordinates;
+        }
+    } catch(err) {
+        console.error("OSRM fetch error:", err);
+    }
+    
+    // ถ้าระบบค้นหาเส้นทางถนนไม่ได้ (Fallback)
+    if (!routeCoords) {
+        const distanceMeters = map.distance(originMarker.getLatLng(), destinationMarker.getLatLng());
+        finalRouteDistance = Math.round((distanceMeters / 1000) * 1.3);
+    }
     if (finalRouteDistance < 1) finalRouteDistance = 1;
 
     // อัปเดต UI แสดงผลลัพธ์
@@ -217,12 +237,166 @@ async function calculateRoute() {
 
     const warningEl = document.getElementById('res-warning');
 
+    // วาดเส้นกราฟิกแสดงเส้นทางที่เดินทางได้และส่วนที่เกิน
+    routeLayerGroup.clearLayers();
+    if (routeCoords) {
+        const MAX_METERS = (maxRange * (battery / 100)) * 1000;
+        const SAFE_METERS = Math.max(0, maxRange * ((battery - 30) / 100)) * 1000;
+        
+        let greenCoords = [];
+        let yellowCoords = [];
+        let redCoords = [];
+        
+        let startPoint = [routeCoords[0][1], routeCoords[0][0]];
+        if (SAFE_METERS > 0) greenCoords.push(startPoint);
+        else yellowCoords.push(startPoint);
+        
+        let currentMeters = 0;
+        let pYellowSplit = null;
+        let pRedSplit = null;
+        
+        for (let i = 1; i < routeCoords.length; i++) {
+            const prevLngLat = routeCoords[i-1];
+            const currLngLat = routeCoords[i];
+            const p1 = [prevLngLat[1], prevLngLat[0]];
+            const p2 = [currLngLat[1], currLngLat[0]];
+            
+            const dist = map.distance(L.latLng(p1), L.latLng(p2));
+            const nextMeters = currentMeters + dist;
+            
+            // ข้ามจากช่วงปลอดภัย (Green) ไปช่วงใกล้หมด (Yellow)
+            if (currentMeters <= SAFE_METERS && nextMeters > SAFE_METERS && SAFE_METERS > 0) {
+                const ratio = (SAFE_METERS - currentMeters) / dist;
+                pYellowSplit = [
+                    p1[0] + (p2[0] - p1[0]) * ratio,
+                    p1[1] + (p2[1] - p1[1]) * ratio
+                ];
+                greenCoords.push(pYellowSplit);
+                yellowCoords.push(pYellowSplit);
+            }
+            
+            // ข้ามจากช่วงแบตเตอรี่ไปเป็นช่วงหมด (Yellow -> Red)
+            if (currentMeters <= MAX_METERS && nextMeters > MAX_METERS) {
+                const ratio = (MAX_METERS - currentMeters) / dist;
+                pRedSplit = [
+                    p1[0] + (p2[0] - p1[0]) * ratio,
+                    p1[1] + (p2[1] - p1[1]) * ratio
+                ];
+                yellowCoords.push(pRedSplit);
+                redCoords.push(pRedSplit);
+            }
+            
+            // เพิ่มจุดเข้าไปใน line ที่ถูกต้อง
+            if (nextMeters <= SAFE_METERS) {
+                greenCoords.push(p2);
+            } else if (nextMeters <= MAX_METERS) {
+                yellowCoords.push(p2);
+            } else {
+                redCoords.push(p2);
+            }
+            
+            currentMeters = nextMeters;
+        }
+        
+        const greenKm = Math.round(SAFE_METERS / 1000);
+        const yellowKm = Math.round((MAX_METERS - SAFE_METERS) / 1000);
+        const redKm = (finalRouteDistance - estimatedRange) > 0 ? Math.round(finalRouteDistance - estimatedRange) : 1;
+        
+        if (greenCoords.length > 0) {
+            L.polyline(greenCoords, { color: '#28a745', weight: 6, opacity: 0.8 }).addTo(routeLayerGroup)
+                .bindTooltip(`🔋 แบตเพียงพอ (>30%) ลากยาวได้อีก ${greenKm} กม.`, {sticky: true});
+        }
+        if (yellowCoords.length > 0) {
+            L.polyline(yellowCoords, { color: '#ffb300', weight: 6, opacity: 0.9 }).addTo(routeLayerGroup)
+                .bindTooltip(`⚠️ เหลือน้อย (<30%) วิ่งต่อได้อีก ${yellowKm} กม. ก่อนแบตหมด`, {sticky: true});
+        }
+        if (redCoords.length > 0) {
+            L.polyline(redCoords, { color: '#dc3545', weight: 6, opacity: 0.8, dashArray: '10, 10' }).addTo(routeLayerGroup)
+                .bindTooltip(`❌ ขาดแบตเตอรี่อีก ${redKm} กม. เลี่ยงไม่ได้`, {sticky: true});
+            
+            if (pRedSplit) {
+                L.marker(pRedSplit, {
+                    icon: L.divIcon({
+                        className: 'battery-out-pin',
+                        html: `<div style="background-color: white; width: 28px; height: 28px; border-radius: 50%; color: #dc3545; display: flex; align-items: center; justify-content: center; border: 2px solid #dc3545; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size:16px; font-family: sans-serif;" title="คาดแบตจะหมด">🪫</div>`,
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 14]
+                    })
+                }).bindPopup('<div style="color: #dc3545; font-weight: bold; text-align: center; font-family: sans-serif;">🪫 จุดคาดการณ์แบตเตอรี่หมด!<br><small style="color:#666; font-weight: normal;">ต้องชาร์จก่อนจะถึงจุดนี้</small></div>').addTo(routeLayerGroup);
+            }
+        }
+    } else {
+        // Fallback วาดเส้นตรงถ้าเรียก OSRM ไม่ได้
+        const startLat = originMarker.getLatLng().lat;
+        const startLng = originMarker.getLatLng().lng;
+        const endLat = destinationMarker.getLatLng().lat;
+        const endLng = destinationMarker.getLatLng().lng;
+        
+        const MAX_METERS = (maxRange * (battery / 100)) * 1000;
+        const SAFE_METERS = Math.max(0, maxRange * ((battery - 30) / 100)) * 1000;
+        
+        const safeKm = Math.round(SAFE_METERS / 1000);
+        const warningKm = Math.round((MAX_METERS - SAFE_METERS) / 1000);
+        const unreachableKm = (finalRouteDistance - estimatedRange) > 0 ? Math.round(finalRouteDistance - estimatedRange) : 1;
+
+        const ratioSafe = safeKm > 0 ? (SAFE_METERS / 1000) / finalRouteDistance : 0;
+        const splitPointSafe = [
+             startLat + (endLat - startLat) * ratioSafe,
+             startLng + (endLng - startLng) * ratioSafe
+        ];
+
+        const ratioRed = (MAX_METERS / 1000) / finalRouteDistance;
+        const splitPointRed = [
+             startLat + (endLat - startLat) * ratioRed,
+             startLng + (endLng - startLng) * ratioRed
+        ];
+
+        if (finalRouteDistance <= (SAFE_METERS / 1000)) {
+             L.polyline([[startLat, startLng], [endLat, endLng]], { color: '#28a745', weight: 6, opacity: 0.8 }).addTo(routeLayerGroup)
+                .bindTooltip(`🔋 แบตเพียงพอ (>30%) ลากยาวได้อีก ${safeKm} กม.`, {sticky: true});
+        } else if (finalRouteDistance <= (MAX_METERS / 1000)) {
+             if (safeKm > 0) {
+                 L.polyline([[startLat, startLng], splitPointSafe], { color: '#28a745', weight: 6, opacity: 0.8 }).addTo(routeLayerGroup)
+                    .bindTooltip(`🔋 แบตเพียงพอ (>30%) ลากยาวได้อีก ${safeKm} กม.`, {sticky: true});
+             }
+             L.polyline([splitPointSafe, [endLat, endLng]], { color: '#ffb300', weight: 6, opacity: 0.9 }).addTo(routeLayerGroup)
+                .bindTooltip(`⚠️ เหลือน้อย (<30%) วิ่งต่อได้อีก ${warningKm} กม. ก่อนแบตหมด`, {sticky: true});
+        } else {
+             if (safeKm > 0) {
+                 L.polyline([[startLat, startLng], splitPointSafe], { color: '#28a745', weight: 6, opacity: 0.8 }).addTo(routeLayerGroup)
+                    .bindTooltip(`🔋 แบตเพียงพอ (>30%) ลากยาวได้อีก ${safeKm} กม.`, {sticky: true});
+             }
+             if (warningKm > 0) {
+                 L.polyline([splitPointSafe, splitPointRed], { color: '#ffb300', weight: 6, opacity: 0.9 }).addTo(routeLayerGroup)
+                    .bindTooltip(`⚠️ เหลือน้อย (<30%) วิ่งต่อได้อีก ${warningKm} กม. ก่อนแบตหมด`, {sticky: true});
+             }
+             L.polyline([splitPointRed, [endLat, endLng]], { color: '#dc3545', weight: 6, opacity: 0.8, dashArray: '10, 10' }).addTo(routeLayerGroup)
+                .bindTooltip(`❌ ขาดแบตเตอรี่อีก ${unreachableKm} กม. เลี่ยงไม่ได้`, {sticky: true});
+             
+             L.marker(splitPointRed, {
+                    icon: L.divIcon({
+                        className: 'battery-out-pin',
+                        html: `<div style="background-color: white; width: 28px; height: 28px; border-radius: 50%; color: #dc3545; display: flex; align-items: center; justify-content: center; border: 2px solid #dc3545; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size:16px; font-family: sans-serif;" title="คาดแบตจะหมด">🪫</div>`,
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 14]
+                    })
+                }).bindPopup('<div style="color: #dc3545; font-weight: bold; text-align: center; font-family: sans-serif;">🪫 จุดคาดการณ์แบตเตอรี่หมด!<br><small style="color:#666; font-weight: normal;">ต้องชาร์จก่อนจะถึงจุดนี้</small></div>').addTo(routeLayerGroup);
+        }
+    }
+
     // ตรวจสอบว่าแบตเตอรี่พอหรือไม่
     if (finalRouteDistance <= estimatedRange) {
         warningEl.style.backgroundColor = "#d4edda";
         warningEl.style.color = "#155724";
         warningEl.innerText = "✅ แบตเตอรี่เพียงพอ! คุณสามารถเดินทางถึงปลายทางได้โดยไม่ต้องแวะชาร์จ";
         markerLayerGroup.clearLayers(); // ล้างหมุดสถานีชาร์จถ้าแบตพอ
+        
+        // ซูมให้เห็นเส้นทาง
+        const allLayers = [ originMarker, destinationMarker, ...routeLayerGroup.getLayers() ].filter(Boolean);
+        if (allLayers.length > 0) {
+            const group = new L.featureGroup(allLayers);
+            map.fitBounds(group.getBounds(), { padding: [50, 50] });
+        }
     } else {
         warningEl.style.backgroundColor = "#f8d7da";
         warningEl.style.color = "#721c24";
@@ -266,9 +440,16 @@ async function findChargingStations(carType) {
             markerLayerGroup.addLayer(marker);
         });
 
-        // เลื่อนกล้อง (Zoom) แผนที่ให้ครอบคลุมทุกหมุด
-        if (availableStations.length > 0) {
-            const group = new L.featureGroup(markerLayerGroup.getLayers());
+        // เลื่อนกล้อง (Zoom) แผนที่ให้ครอบคลุมทุกหมุดและเส้นทาง
+        const allLayers = [
+            ...markerLayerGroup.getLayers(),
+            ...routeLayerGroup.getLayers(),
+            originMarker,
+            destinationMarker
+        ].filter(Boolean);
+
+        if (allLayers.length > 0) {
+            const group = new L.featureGroup(allLayers);
             map.fitBounds(group.getBounds(), { padding: [50, 50] });
         }
 
