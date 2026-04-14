@@ -9,71 +9,86 @@ body {
     display: flex;
     height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f8;
 }
 
 /* แผงควบคุมด้านซ้าย */
 .sidebar {
-    width: 350px;
+    width: 380px; /* ขยายให้กว้างขึ้นเล็กน้อยเพื่อเพิ่มพื้นที่วางข้อมูล */
     padding: 25px;
     background-color: #ffffff;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.08);
     z-index: 1000;
-    /* ให้อยู่เหนือแผนที่ */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    transition: all 0.3s ease-in-out;
 }
 
 .sidebar h2 {
     margin-top: 0;
     margin-bottom: 5px;
     color: #1a73e8;
+    font-size: 24px;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 16px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+    margin-bottom: 6px;
+    font-weight: 600;
     font-size: 14px;
+    color: #333;
 }
 
 .form-group input,
 .form-group select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
+    padding: 12px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #1a73e8;
 }
 
 .btn-calculate {
     background-color: #1a73e8;
     color: white;
     border: none;
-    padding: 12px;
-    border-radius: 5px;
+    padding: 14px;
+    border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
     font-weight: bold;
-    margin-top: 10px;
-    transition: background-color 0.3s;
+    margin-top: 15px;
+    transition: background-color 0.3s, transform 0.1s;
+    box-shadow: 0 4px 10px rgba(26, 115, 232, 0.2);
 }
 
 .btn-calculate:hover {
     background-color: #1557b0;
 }
 
+.btn-calculate:active {
+    transform: scale(0.98);
+}
+
 .btn-pin {
-    background-color: #f1f3f4;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 0 12px;
+    background-color: #f8f9fa;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0 14px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px;
     transition: all 0.2s;
     display: flex;
     align-items: center;
@@ -82,39 +97,115 @@ body {
 
 .btn-pin:hover {
     background-color: #e8eaed;
+    border-color: #d1d1d1;
 }
 
 .btn-pin.active {
-    background-color: #cce5ff;
-    border-color: #b8daff;
-    box-shadow: 0 0 0 3px rgba(0,123,255,.25);
+    background-color: #e8f0fe;
+    border-color: #1a73e8;
+    color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
 }
 
 /* กล่องแสดงผลลัพธ์ */
 .result-box {
     margin-top: 25px;
-    padding: 15px;
+    padding: 18px;
     background-color: #f8f9fa;
-    border-radius: 8px;
+    border-radius: 10px;
     border-left: 5px solid #1a73e8;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .result-box h3 {
     margin-top: 0;
-    font-size: 16px;
+    font-size: 17px;
+    color: #222;
 }
 
 .warning-text {
-    margin-top: 10px;
-    font-weight: bold;
+    margin-top: 12px;
+    font-weight: 600;
     font-size: 14px;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 12px;
+    border-radius: 6px;
+    line-height: 1.4;
 }
 
 /* พื้นที่แผนที่ทางขวา */
 #map {
     flex-grow: 1;
-    /* ขยายเต็มพื้นที่ที่เหลือ */
     height: 100vh;
+    z-index: 1;
+}
+
+/* ปรับแต่ง Scrollbar สวยงาม */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent; 
+}
+::-webkit-scrollbar-thumb {
+    background: #ccc; 
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #999; 
+}
+
+/* -------------------------------------------
+   RESPONSIVE DESIGN (ปรับเพื่อรองรับมือถือและอุปกรณ์อื่น)
+   ------------------------------------------- */
+@media screen and (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    #map {
+        width: 100vw;
+        height: 48vh; /* แผนที่ใช้พื้นที่ด้านบนครึ่งนึง */
+        flex-grow: 0;
+    }
+
+    .sidebar {
+        width: 100vw;
+        height: 52vh; /* ควบคุมพาเนลให้อยู่ด้านล่าง */
+        max-height: 52vh;
+        padding: 20px;
+        border-radius: 20px 20px 0 0; /* ขอบมนด้านบนแสดงความเป็น Bottom Sheet */
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        margin-top: -15px; /* ดึงขึ้นมาทับแผนที่เล็กน้อย */
+    }
+
+    /* เส้นลาก (Drag handle) เลียนแบบแอปมือถือ */
+    .sidebar::before {
+        content: "";
+        display: block;
+        width: 45px;
+        height: 5px;
+        background-color: #ddd;
+        border-radius: 4px;
+        margin: 0 auto 15px auto;
+    }
+
+    .sidebar h2 {
+        font-size: 20px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 10px;
+        font-size: 16px; /* เพื่อป้องกัน iPhone ซูมหน้าจออัตโนมัติ ต้องตั้งไซส์ 16 ขึ้นไป */
+    }
+
+    .btn-calculate {
+        padding: 12px;
+        font-size: 16px;
+    }
 }

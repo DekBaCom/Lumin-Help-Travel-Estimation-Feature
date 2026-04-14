@@ -457,3 +457,10 @@ async function findChargingStations(carType) {
         console.error("Error loading stations:", error);
     }
 }
+
+// อัปเดตแผนที่เมื่อมีการหมุนจอหรือย่อ/ขยายหน้าต่าง (Responsive Support)
+window.addEventListener('resize', () => {
+    if (map) {
+        setTimeout(() => map.invalidateSize(), 200);
+    }
+});
