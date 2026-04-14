@@ -4,7 +4,7 @@ Lumin Help is a smart travel estimation tool designed specifically for **Changan
 
 If the battery range is insufficient, the system provides recommendations for EV charging point locations.
 
-![Application Preview](https://img.icons8.com/color/48/000000/electric-vehicle.png) <!-- Placeholder, imagine a nice screenshot here! -->
+
 
 ---
 
