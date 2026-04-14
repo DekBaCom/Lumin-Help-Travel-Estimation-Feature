@@ -1,0 +1,41 @@
+[
+    {
+        "id": "ST-001",
+        "name": "EA Anywhere - ปตท. มอเตอร์เวย์ ขาออก",
+        "lat": 13.5234,
+        "lng": 101.0123,
+        "types": [
+            "AC",
+            "DC"
+        ]
+    },
+    {
+        "id": "ST-002",
+        "name": "PEA VOLTA - ชลบุรี",
+        "lat": 13.3611,
+        "lng": 100.9846,
+        "types": [
+            "AC",
+            "DC"
+        ]
+    },
+    {
+        "id": "ST-003",
+        "name": "Elexa - Cafe Amazon พัทยา",
+        "lat": 12.9235,
+        "lng": 100.8824,
+        "types": [
+            "AC"
+        ]
+    },
+    {
+        "id": "ST-004",
+        "name": "PTT EV Station - อยุธยา",
+        "lat": 14.3516,
+        "lng": 100.5773,
+        "types": [
+            "AC",
+            "DC"
+        ]
+    }
+]

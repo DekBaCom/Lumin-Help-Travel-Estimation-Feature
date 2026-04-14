@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumin Help - EV Trip Planner</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>Lumin Help 🚙</h2>
+        <p style="color: #666; font-size: 14px;">ระบบประเมินการเดินทางสำหรับ Changan Lumin L</p>
+
+        <div class="form-group">
+            <label>ต้นทาง:</label>
+            <div style="display: flex; gap: 4px;">
+                <input type="text" id="origin" placeholder="เช่น กรุงเทพมหานคร แล้วกด 🔍">
+                <button class="btn-pin" onclick="searchLocation('origin')" title="ค้นหาสถานที่">🔍</button>
+                <button id="btn-pin-origin" class="btn-pin" onclick="enablePinMode('origin')" title="คลิกบนแผนที่เพื่อปักหมุดต้นทาง">📍</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>ปลายทาง:</label>
+            <div style="display: flex; gap: 4px;">
+                <input type="text" id="destination" placeholder="เช่น พัทยา ชลบุรี แล้วกด 🔍">
+                <button class="btn-pin" onclick="searchLocation('destination')" title="ค้นหาสถานที่">🔍</button>
+                <button id="btn-pin-destination" class="btn-pin" onclick="enablePinMode('destination')" title="คลิกบนแผนที่เพื่อปักหมุดปลายทาง">📍</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>รุ่นรถ Changan Lumin L:</label>
+            <select id="carModel">
+                <option value="AC">Lumin L AC (วิ่งได้ 210 กม.)</option>
+                <option value="DC">Lumin L DC (วิ่งได้ 301 กม.)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>แบตเตอรี่ปัจจุบัน (%):</label>
+            <input type="number" id="battery" value="100" min="1" max="100">
+        </div>
+
+        <button class="btn-calculate" onclick="calculateRoute()">คำนวณการเดินทาง</button>
+
+        <div id="result-panel" class="result-box" style="display:none;">
+            <h3>📊 สรุปการเดินทาง</h3>
+            <p>ระยะทางถึงปลายทาง: <strong><span id="res-distance">-</span> กม.</strong></p>
+            <p>ระยะทางที่รถวิ่งได้จริง: <strong><span id="res-range">-</span> กม.</strong></p>
+            <div id="res-warning" class="warning-text"></div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
