@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>วิธีใช้งาน - Lumin Help Trip Planner</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Specific Extra Styles for How-To Page */
+        body {
+            display: block; /* Override flex from style.css */
+            background-color: #f4f6f8;
+            padding: 40px 20px;
+            overflow-y: auto;
+            height: auto;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: #1a73e8;
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 15px;
+        }
+        .step-box {
+            display: flex;
+            align-items: flex-start;
+            background: #fdfdfd;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #1a73e8;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .step-box:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            background: #ffffff;
+        }
+        .step-number {
+            background: #1a73e8;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-right: 15px;
+            box-shadow: 0 3px 8px rgba(26,115,232,0.3);
+        }
+        .step-content h3 {
+            margin: 0 0 8px 0;
+            color: #222;
+            font-size: 18px;
+        }
+        .step-content p {
+            margin: 0;
+            color: #555;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .feature-card {
+            background: #fff;
+            border: 1.5px solid #eef2f5;
+            padding: 25px 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        .color-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f3f4;
+            color: #333;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 30px;
+            transition: all 0.2s;
+        }
+        .back-btn:hover {
+            background: #e2e5e9;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 20px 15px; }
+            .container { padding: 25px; }
+            .step-box { flex-direction: column; }
+            .step-number { margin-bottom: 12px; }
+            h1 { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">⬅ กลับไปแผนที่หลัก</a>
+        
+        <h1>📖 วิธีใช้งาน Lumin Help</h1>
+        <p class="subtitle">คู่มือการใช้งานระบบประเมินการเดินทางสำหรับรถยนต์ไฟฟ้า Changan Lumin L</p>
+
+        <div class="step-box">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>กำหนดจุดต้นทางและปลายทาง</h3>
+                <p>คุณสามารถพิมพ์ชื่อสถานที่ในช่องค้นหาแล้วกด <b>ปุ่มค้นหา (🔍)</b> เพื่อให้ระบบหาตัวอัตโนมัติ หรือจะกด <b>ปุ่มหมุดแผนที่ (📍)</b> แล้วนำไปคลิกปักจุดเป๊ะๆ ลงบนแผนที่ด้วยตนเองเลยก็ได้</p>
+            </div>
+        </div>
+
+        <div class="step-box">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>เลือกสเปครถของคุณ</h3>
+                <p>เลือกรุ่นรถที่คุณใช้งานอยู่จริง <b>ระหว่าง Lumin L AC (รุ่นแบต 210 กม.)</b> หรือ <b>Lumin L DC (รุ่นแบต 301 กม.)</b> เพื่อให้ระบบนำสเปคไปคำนวณการกินไฟให้แม่นยำที่สุด</p>
+            </div>
+        </div>
+
+        <div class="step-box">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>ระบุแบตเตอรี่ปัจจุบัน</h3>
+                <p>กรอกข้อมูลเปอร์เซ็นต์แบตเตอรี่ที่คุณมี ณ ตอนนี้ (1-100%) เพื่อตีค่าระยะทางขับขี่ที่แท้จริงที่คุณไปได้</p>
+            </div>
+        </div>
+
+        <div class="step-box">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h3>กดคำนวณและประเมินผล</h3>
+                <p>คลิกที่ปุ่ม <b>"คำนวณการเดินทาง"</b> ระบบจะดึงข้อมูลโครงข่ายถนน และวาดเส้นทางการขับขี่ลงบนแผนที่ พร้อมประเมินระยะทางที่สามารถเดินทางได้จริง โดยแบ่งแยกช่วงสีให้ทันที:</p>
+            </div>
+        </div>
+
+        <h2 style="text-align: center; margin-top: 50px; margin-bottom: 10px; color: #333; font-size: 22px;">ทำความเข้าใจการแบ่งสีเส้นทาง 🗺️</h2>
+        <div class="feature-grid">
+            <div class="feature-card" style="border-top: 4px solid #28a745;">
+                <div class="color-dot" style="background-color: #28a745; box-shadow: 0 0 12px rgba(40,167,69,0.4);"></div>
+                <h4 style="margin:0 0 10px 0; color: #28a745; font-size: 16px;">เส้นสีเขียว (ปลอดภัย)</h4>
+                <p style="font-size: 14px; color: #555;">ขับขี่ได้สบาย แบตเตอรี่ยังคงมีปริมาณมากพอ (สูงกว่า 30%)</p>
+            </div>
+            
+            <div class="feature-card" style="border-top: 4px solid #ffb300;">
+                <div class="color-dot" style="background-color: #ffb300; box-shadow: 0 0 12px rgba(255,179,0,0.4);"></div>
+                <h4 style="margin:0 0 10px 0; color: #ffb300; font-size: 16px;">เส้นสีเหลือง (เฝ้าระวัง)</h4>
+                <p style="font-size: 14px; color: #555;">แบตเตอรี่เริ่มต่ำ (เหลือน้อยกว่า 30%) เป็นช่วงที่คุณควรเริ่มเข้าสถานีเพื่อชาร์จ</p>
+            </div>
+
+            <div class="feature-card" style="border-top: 4px solid #dc3545;">
+                <div class="color-dot" style="background-color: #dc3545; box-shadow: 0 0 12px rgba(220,53,69,0.4);"></div>
+                <h4 style="margin:0 0 10px 0; color: #dc3545; font-size: 16px;">เส้นประสีแดง (ต้องชาร์จ)</h4>
+                <p style="font-size: 14px; color: #555;">รถวิ่งไปต่อไม่ได้แล้ว เนื่องจากแบตเตอรี่จะหมดก่อนถึงจุดหมายปลายทาง</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; background: #f0fdf4; color: #166534; padding: 20px; border-radius: 12px; border-left: 6px solid #22c55e;">
+            <strong style="font-size: 16px;">💡 การช่วยเหลือเสริม (Smart Charging):</strong><br>
+            <span style="font-size: 15px; line-height: 1.6; display: block; margin-top: 8px;">หากระบบคำนวณว่าคุณไปไม่ถึงปลายทาง (ปรากฏเป็นเส้นประสีแดงบนจอ) ระบบจะทำการดึงข้อมูล <b>"สถานีชาร์จ"</b> บริเวณใกล้เคียงขึ้นมาปักหมุดเผื่อไว้บนแผนที่ให้ทันที (นอกจากนี้ยังรองรับการคัดกรองเฉพาะสถานีที่มีหัวชาร์จตรงกับรุ่นรถของคุณ) คุณสามารถกดที่หมุดสถานีชาร์จ เพื่อขอนำทางผ่าน Google Maps ไปยังจุดนั้นได้เลยครับ!</span>
+        </div>
+
+    </div>
+</body>
+</html>
